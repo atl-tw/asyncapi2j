@@ -34,24 +34,25 @@ as this project is not in Maven Central yet. Then you can included the plugin in
             <goals>
                 <goal>generate</goal>
             </goals>
+            <configuration>
+                <!-- path to your AsyncAPI descriptor -->
+                <source>${project.basedir}src/asyncapi/my-api.yaml</source>
+                <!-- Output package -->
+                <packageName>my.api.package</packageName>
+                <!-- this is the default output directory -->
+                <outputDirectory>${project.build.directory}/generated-sources/asyncapi2j</outputDirectory>
+                <json>
+                    <generateBuilders>true</generateBuilders>
+                </json>
+            </configuration>
         </execution>
     </executions>
-    <configuration>
-        <!-- path to your AsyncAPI descriptor -->
-        <source>src/asyncapi/my-api.yaml</source>
-        <!-- Output package -->
-        <packageName>my.api.package</packageName>
-        <!-- this is the default output directory -->
-        <outputDirectory>${project.build.directory}/generated-sources/asyncapi2j</outputDirectory>
-        <json>
-            <generateBuilders>true</generateBuilders>
-        </json>
-    </configuration>
 </plugin>
 ```
 
 JSON schema generation is done with [jsonschema2pojo](https://github.com/joelittlejohn/jsonschema2pojo) and the 
-options available under `<json>` will match the [GenerationConfig](https://joelittlejohn.github.io/jsonschema2pojo/javadocs/1.2.1/)
+options available under `<json>` will match the 
+[GenerationConfig](https://joelittlejohn.github.io/jsonschema2pojo/javadocs/1.2.1/org/jsonschema2pojo/GenerationConfig.html)
 class from that library.
 
 This will generate the schema objects into `[packageName].model` and a class called `MQTTClient` at the top of the package.
