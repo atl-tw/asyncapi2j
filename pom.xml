@@ -52,5 +52,14 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
+    <distributionManagement>
+        <repository>
+            <id>gh</id>
+            <url>https://maven.pkg.github.com/atl-tw/asyncapi2j</url>
+        </repository>
+        <snapshotRepository>
+            <id>gh</id>
+            <url>https://maven.pkg.github.com/atl-tw/asyncapi2j</url>
+        </snapshotRepository>
+    </distributionManagement>
 </project>
