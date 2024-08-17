@@ -74,7 +74,7 @@ You will also need the `asyncapi2j-lib` dependency in your project. This contain
  <dependency>
   <groupId>com.thoughtworks.asyncapi</groupId>
   <artifactId>asyncapi2j-lib</artifactId>
-  <version>@project.version@</version>
+  <version>${asyncapi2j.version}</version>
 </dependency>
 ```
 
