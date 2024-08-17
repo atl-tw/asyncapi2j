@@ -1,0 +1,756 @@
+asyncapi: "2.6.0"
+info:
+  title: Tender Utilities
+  version: "1.0.1"
+  description: |
+    Tender Utilities is an async API to enable interaction 
+    between a Point of Sale and a set of payment/tender utility functions.
+servers:
+  test:
+    url: test.utities.kroger.com:{port}
+    protocol: mqtt
+    description: test utilities broker
+    variables:
+      port:
+        description: Secure connection (TLS) is available through port 8883.
+        default: "1883"
+        enum:
+          - "1883"
+          - "8883"
+
+defaultContentType: application/json
+
+channels:
+  payments/1/0/tender/pre-inquiry:
+    description: |
+      A Client needs to know what tenders might not be allowed for a provided basket.
+      The Tender to apply to an order is not yet known.
+    publish:
+      operationId: preInquiryRequest
+      traits:
+        - $ref: "#/components/operationTraits/mqtt"
+      message:
+        $ref: "#/components/messages/preInquiryRequest"
+
+  payments/1/0/client/{clientId}/tender/pre-inquiry/processed:
+    description: |
+      A Client listens for a response on tender restriction requests.
+      clientId:
+        $ref: "#/components/parameters/clientId"
+    parameters:
+      clientId:
+        $ref: "#/components/parameters/clientId"
+    subscribe:
+      operationId: preInquiryResponse
+      traits:
+        - $ref: "#/components/operationTraits/mqtt"
+      message:
+        $ref: "#/components/messages/preInquiryResponse"
+
+  payments/1/0/client/{clientId}/tender/pre-inquiry/errored:
+    description: |
+      A Client listens for error responses to tender restriction
+      requests that were sent by the Client.
+    parameters:
+      clientId:
+        $ref: "#/components/parameters/clientId"
+    subscribe:
+      operationId: preInquiryErrorResponse
+      traits:
+        - $ref: "#/components/operationTraits/mqtt"
+      message:
+        $ref: "#/components/messages/inquiryErrorResponse"
+
+
+  payments/1/0/tender/inquiry:
+    description: |
+      A Client needs to know if a specific tender is allowed for a provided basket.
+      The Tender (and any accompanying details) is provided.
+    publish:
+      operationId: inquiryRequest
+      traits:
+        - $ref: "#/components/operationTraits/mqtt"
+      message:
+        $ref: "#/components/messages/inquiryRequest"
+
+  payments/1/0/client/{clientId}/tender/inquiry/processed:
+    description: |
+      A Client listens for a response on tender restriction requests.
+      clientId:
+        $ref: "#/components/parameters/clientId"
+    parameters:
+      clientId:
+        $ref: "#/components/parameters/clientId"
+    subscribe:
+      operationId: inquiryResponse
+      traits:
+        - $ref: "#/components/operationTraits/mqtt"
+      message:
+        $ref: "#/components/messages/inquiryResponse"
+
+  payments/1/0/client/{clientId}/tender/inquiry/errored:
+    description: |
+      A Client listens for error responses to tender restriction
+      requests that were sent by the Client.
+    parameters:
+      clientId:
+        $ref: "#/components/parameters/clientId"
+    subscribe:
+      operationId: inquiryErrorResponse
+      traits:
+        - $ref: "#/components/operationTraits/mqtt"
+      message:
+        $ref: "#/components/messages/inquiryErrorResponse"
+
+
+  payments/1/0/funding/advice:
+    description: |
+      A Client need to know how to apply a provided payment 
+      authorization to a provided set of line items.
+    publish:
+      operationId: fundingAdviceRequest
+      traits:
+        - $ref: "#/components/operationTraits/mqtt"
+      message:
+        $ref: "#/components/messages/fundingAdviceRequest"
+
+  payments/1/0/client/{clientId}/funding/advice/processed:
+    description: |
+      A Client listens for a response on the requested funding advice.
+      clientId:
+        $ref: "#/components/parameters/clientId"
+    parameters:
+      clientId:
+        $ref: "#/components/parameters/clientId"
+    subscribe:
+      operationId: fundingAdviceResponse
+      traits:
+        - $ref: "#/components/operationTraits/mqtt"
+      message:
+        $ref: "#/components/messages/fundingAdviceResponse"
+
+  payments/1/0/client/{clientId}/funding/advice/errored:
+    description: |
+      A Client listens for error responses to funding advice
+      requests that were sent by the Client.
+    parameters:
+      clientId:
+        $ref: "#/components/parameters/clientId"
+    subscribe:
+      operationId: fundingAdviceErrorResponse
+      traits:
+        - $ref: "#/components/operationTraits/mqtt"
+      message:
+        $ref: "#/components/messages/inquiryErrorResponse"
+
+
+components:
+  messages:
+    preInquiryRequest:
+      name: preInquiryRequest
+      title: Pre Tender Inquiry (Restriction) Request
+      summary: Attempt to find out what tenders are allowed for the provided basket.
+      contentType: application/json
+      traits:
+        - $ref: "#/components/messageTraits/commonHeaders"
+      payload:
+        $ref: "#/components/schemas/PreInquiryRequest"
+
+    preInquiryResponse:
+      name: preInquiryResponse
+      title: Pre Inquiry Response
+      summary: Messages regarding the response of an inquiry into tender restrictions.
+      traits:
+        - $ref: "#/components/messageTraits/commonHeaders"
+      payload:
+        $ref: "#/components/schemas/PreInquiryResponse"
+
+
+    inquiryRequest:
+      name: inquiryRequest
+      title: Tender Inquiry (Restriction) Request
+      summary: Attempt to find out what tenders are allowed for the provided basket.
+      contentType: application/json
+      traits:
+        - $ref: "#/components/messageTraits/commonHeaders"
+      payload:
+        $ref: "#/components/schemas/InquiryRequest"
+
+    inquiryResponse:
+      name: inquiryResponse
+      title: Inquiry Response
+      summary: Messages regarding the response of an inquiry into tender restrictions.
+      traits:
+        - $ref: "#/components/messageTraits/commonHeaders"
+      payload:
+        $ref: "#/components/schemas/InquiryResponse"
+
+
+    fundingAdviceRequest:
+      name: fundingAdviceRequest
+      title: Funding Advice request
+      summary: Request to allocate funds to line items for a provided tender.
+      contentType: application/json
+      traits:
+        - $ref: "#/components/messageTraits/commonHeaders"
+      payload:
+        $ref: "#/components/schemas/FundingAdviceRequest"
+
+    fundingAdviceResponse:
+      name: fundingAdviceResponse
+      title: Funding Advice Response
+      summary: Messages regarding the response of a funding advice request.
+      traits:
+        - $ref: "#/components/messageTraits/commonHeaders"
+      payload:
+        $ref: "#/components/schemas/FundingAdviceResponse"
+
+
+    inquiryErrorResponse:
+      name: inquiryErrorResponse
+      title: Inquiry Error Response
+      summary: Messages regarding an error that occured duing an inquiry operation.
+      traits:
+        - $ref: "#/components/messageTraits/commonHeaders"
+      payload:
+        $ref: "#/components/schemas/InquiryErrorResponse"
+
+
+  schemas:
+    BaseSchema:
+      type: object
+      required: ["clientId","sentAt"]
+      properties:
+        correlationId:
+          $ref: "#/components/schemas/CorrelationId"
+        clientId:
+          $ref: "#/components/schemas/ClientId"
+        associateId:
+          $ref: "#/components/schemas/AssociateId"
+        sentAt:
+          $ref: "#/components/schemas/SentAt"
+        callingApplication:
+          $ref: "#/components/schemas/Application"
+
+    PreInquiryRequest:
+      allOf:
+        - $ref: "#/components/schemas/BaseSchema"
+      properties:
+        order:
+          $ref: "#/components/schemas/OrderDetails"
+        lineItems:
+          type: array
+          items:
+            - $ref: "#/components/schemas/BaseLineItem"
+    PreInquiryResponse:
+      allOf:
+        - $ref: "#/components/schemas/BaseSchema"
+      type: object
+      properties:
+        lineItems:
+          type: array
+          items:
+            - $ref: "#/components/schemas/PreInquiryLineItem"
+
+    InquiryRequest:
+      allOf:
+        - $ref: "#/components/schemas/BaseSchema"
+      type: object
+      properties:
+        order:
+          $ref: "#/components/schemas/OrderDetails"
+        lineItems:
+          type: array
+          items:
+            - $ref: "#/components/schemas/LineItem"
+        appliedTenders:
+          type: array
+          items:
+            - $ref: "#/components/schemas/TenderIdentifier"
+        tender:
+          $ref: "#/components/schemas/TenderDetails"
+    InquiryResponse:
+      allOf:
+        - $ref: "#/components/schemas/BaseSchema"
+      type: object
+      properties:
+        lineItems:
+          type: array
+          items:
+            - $ref: "#/components/schemas/InquiryLineItem"
+
+    FundingAdviceRequest:
+      allOf:
+        - $ref: "#/components/schemas/BaseSchema"
+      type: object
+      properties:
+        order:
+          $ref: "#/components/schemas/OrderDetails"
+        lineItems:
+          type: array
+          items:
+            - $ref: "#/components/schemas/FundedLineItem"
+        paymentResponse:
+          $ref: "#/components/schemas/PaymentResponse"
+    FundingAdviceResponse:
+      allOf:
+        - $ref: "#/components/schemas/BaseSchema"
+      type: object
+      properties:
+        lineItems:
+          type: array
+          items:
+            - $ref: "#/components/schemas/AdviceLineItem"
+
+    InquiryErrorResponse:
+      allOf:
+        - $ref: "#/components/schemas/BaseSchema"
+      properties:
+        error:
+          $ref: "#/components/schemas/InquiryErrorDetails"
+
+
+    Datetime:
+      type: object
+      properties:
+        value:
+          type: string
+          format: date-time
+          description: Date and time when the message was sent formatted in ISO 8601.  Always converted to UTC.
+        timezone:
+          type: string
+          description: local timezone in which the timestamp was generated.
+    CorrelationId:
+      type: string
+      description: Trace identifier passed in from client and send back on any responses, if applicable.
+    ClientId:
+      type: string
+      description: Client Id connected to payment infrastructure.
+    AssociateId:
+      type: string
+      description: Associate (store employee) sending this message. Should not be their euid. 
+    SentAt:
+      allOf:
+        - $ref: '#/components/schemas/Datetime'
+    Application:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Identify the calling application type.
+        name:
+          type: string
+          description: Application name.
+        version:
+          type: string
+          description: Application version number, as a string.
+
+    TenderIdentifier:
+      type: number
+      description: |
+        Tender ID is made up of two components, the Type and the Variety
+        For example Type 4 Variety 1 means VISA credit, which would equate to a TenderIdentifer of 41
+        See page for more details: https://confluence.kroger.com/confluence/display/POSREL/Enterprise+Tender+Listing
+    CustomerIdentity:
+      type: object
+      properties:
+        customerId:
+          type: string
+          description: 11 digit number representing a Kroger customer.
+        altId:
+          type: string
+          description: |
+              Alternative 10 digit number representing a Kroger customer.
+              Commonly a phone number that is entered into the pinpad.
+    MonetaryAmount:
+      type: object
+      properties:
+        amount:
+          type: integer
+          description: Value in minor units (e.g. $12.34 as 1234).
+        currencyCode:
+          type: string
+          description: three character ISO currency code (e.g. USD).
+
+    CheckType:
+      type: string
+      description: Type of check |
+        PERSONAL is a check from a personal bank ccount
+        PAYROLL is a is a check to a person from a person's employer
+        CORPORATE_PAYROLL is a check to a Krpger employee from Kroger
+        GOVERNMENT is a check to a person issued by the government
+      enum:
+        - PERSONAL
+        - PAYROLL
+        - CORPORATE_PAYROLL
+        - GOVERNMENT
+    EBTBenefit:
+      type: string
+      description: Pinpad cancel specific status values |
+        SNAP is selected when customer desires to use SNAP food benefit
+        TANF is selected when customer desires to use SNAP cash benefit
+      enum:
+        - SNAP
+        - TANF
+    WICCardType:
+      type: string
+      description: Type of card product for the WIC program |
+        ELECTRONIC is a smart chip card where benefits are retrieved/updated in the card
+        ONLINE is a magnetic stripe card where benefits are retrieved online
+      enum:
+        - ELECTRONIC
+        - ONLINE
+    WICAgencyId:
+      type: string
+      description: The agency identifier for which a WIC benefit program is issued 
+    WalletType:
+      type: string
+      description: Indicates wether the tender originated from Kroger digital wallet
+      enum:
+        - NONE
+        - KROGER_PAY
+        - E_COMMERCE
+    BenefitCardType:
+      type: string
+      description: Indicaes what kind of health card account this tender may be
+      enum:
+        - NONE
+        - HSA
+        - FSA
+        - HRA
+        - SODA
+    BinFlags:
+      type: object
+      properties:
+        fsaAllowed:
+          type: boolean
+          description: Indicaes whether this FSA card is allowed to be used for purchases.
+        onlineWIC:
+          type: boolean
+          description: Indicates whether this card is a WIC card
+        partialAuthAllowed:
+          type: boolean
+          description: Indicates whether this card allows an authorization to  be less that what was requested
+        pinEncouragement:
+          type: boolean
+          description: Indicates whether this card should request a prompting for PIN on the pinpad 
+        binRestriction:
+          type: boolean
+          description: Indicates that this card is restricted from making purchases
+        cobrandGpr:
+          type: boolean
+          description: Indicates whether this card is a GPR co-brand Kroger card
+        prohibitValueCard:
+          type: boolean
+          description: Indicates that this card is a certain value card that cannot be used for purchases 
+        prepaidValueCard:
+          type: boolean
+          description: Indicates whether this card is a prepaid value card card
+        cobrandUSBank:
+          type: boolean
+          description: Indicates whether this card is a US Bank co-brand Kroger card
+        preferredTender:
+          type: boolean
+          description: Indicates ?
+        surcharge:
+          type: boolean
+          description: Indicates that this card may include additional surcharges when used
+        paymentEncouragement:
+          type: boolean
+          description: Indicates ?
+        promptForPinValueCard:
+          type: boolean
+          description: Indicates that this value card should prmopt for a PIN on the pinpad 
+        zipcodeExclusion:
+          type: boolean
+          description: Indicates whether this card has postal code restrictions 
+
+    CardAddenda:
+      type: object
+      properties:
+        cardLastFour:
+          type: string
+          description: Last four digits of the card.
+        cardBin:
+          type: string
+          description: First 6 or 8 or 10 digits from card.
+    GiftCardAddenda:
+      type: object
+      properties:
+        gtin:
+          type: string
+          description: Item code for this card.
+        accountNumber:
+          type: string
+          description: Account number for this card.
+    AccountAddenda:
+      type: object
+      properties:
+        checkNumber:
+          type: string
+          description: For checks, the check number e.g. 1032
+        routingAccountNumber:
+          type: string
+          description: The combined bank routing number and account number (no spaces)
+        issueDate:
+          type: string
+          format: date
+          description: The Date on the check (optional)
+        checkType:
+          $ref: "#/components/schemas/CheckType"
+          description: For checks, the type of check
+    EBTAddenda:
+      type: object
+      properties:
+        account:
+          $ref: "#/components/schemas/EBTBenefit"
+    WICAddenda:
+      type: object
+      properties:
+        benefits:
+          type: array
+          items:
+            - $ref: "#/components/schemas/BenefitItem"
+        cardType:
+          $ref: "#/components/schemas/WICCardType"
+        agency:
+          $ref: "#/components/schemas/WICAgencyId"
+    SolutranAddenda:
+      type: object
+      properties:
+        s3Number:
+          type: string
+          description: Solutran account number from card track data.
+    KrogerPayAddenda:
+      type: object
+      properties:
+        customer:
+          $ref: "#/components/schemas/CustomerIdentity"
+
+    OrderDetails:
+      type: object
+      properties:
+        orderDatetime:
+          $ref: "#/components/schemas/Datetime"
+        orderNumber:
+          type: string
+          description: Unique identifier for this sale provided by the client (POS transaction no. or online order no.)
+        customerIdentity:
+          $ref: "#/components/schemas/CustomerIdentity"
+    TenderDetails:
+      type: object
+      properties:
+        tenderIdentifier:
+          $ref: "#/components/schemas/TenderIdentifier"
+        binFlags:
+          $ref: "#/components/schemas/BinFlags"
+        walletType:
+          $ref: "#/components/schemas/WalletType"
+        benefitCardType:
+          $ref: "#/components/schemas/BenefitCardType"
+        cardAddenda:
+          $ref: "#/components/schemas/CardAddenda"
+        gittCardAddenda:
+          $ref: "#/components/schemas/GiftCardAddenda"
+        accountAddenda:
+          $ref: "#/components/schemas/AccountAddenda"
+        ebtAddenda:
+          $ref: "#/components/schemas/EBTAddenda"
+        wicAddenda:
+          $ref: "#/components/schemas/WICAddenda"
+        solutranAddenda:
+          $ref: "#/components/schemas/SolutranAddenda"
+        krogerPayAddenda:
+          $ref: "#/components/schemas/KrogerPayAddenda"
+
+    PaymentResponse:
+      type: object
+      properties:
+        tenderIdentifier:
+          $ref: "#/components/schemas/TenderIdentifier"
+        benefitCardType:
+          $ref: "#/components/schemas/BenefitCardType"
+        approvedAmount:
+          $ref: "#/components/schemas/MonetaryAmount"
+          description: Approved amount for this tender by the payment provider
+        lineItems:
+          type: array
+          items:
+            - $ref: "#/components/schemas/BenefitLineItem"
+
+    InquiryErrorDetails:
+      type: object
+      properties:
+        errorCode:
+          type: string
+          description: Code representing the kind of error that occured [code list needs definition]
+        errorDescription:
+          type: string
+          description: readable description of the error condition 
+
+    RestrictionResultCode:
+      type: string
+      description: Result of the restriction check |
+        TENDER_ALLOWED means the item is allowed to be purchased with the chosen tender
+        TENDER_ALLOWED_WITH_RESTRICTION means the item is allowed, but has eiher a quantity or price restriction (see added data fields)
+        TENDER_NOT_ALLOWED means the item is not allowed to be purchased with the chosen tender
+      enum:
+        - TENDER_ALLOWED
+        - TENDER_ALLOWED_WITH_RESTRICTION
+        - TENDER_NOT_ALLOWED
+    BenefitResultCode:
+      type: string
+      description: Result of benefit provider from their authorization |
+        ITEM_ALLOWED means the item is eligible to be used as payment from this benefit privider
+        ITEM_APPROVED means the item is approved or allowed by the benefit provider
+        ITEM_APPROVED_WITH_ADJUSTMENT means the item is approved or allowed  but has a specific limit (see added data fields)
+        ITEM_NOT_APPROVED means the item is not approved or allowed by the benefit provider
+      enum:
+        - ITEM_ALLOWED
+        - ITEM_APPROVED
+        - ITEM_APPROVED_WITH_ADJUSTMENT
+        - ITEM_NOT_APPROVED
+
+    RestrictionResult:
+      type: object
+      properties:
+        tenderIdentifier:
+          $ref: "#/components/schemas/TenderIdentifier"
+        allowedQuantity:
+          type: integer
+          description: Item quantity allowed by the tender or benefits
+        allowedTotal:
+          $ref: "#/components/schemas/MonetaryAmount"
+          description: Item price total allowed by the tender or benefit
+        result:
+          $ref: "#/components/schemas/RestrictionResultCode"
+    BenefitResult:
+      type: object
+      properties:
+        approvedQuantity:
+          type: integer
+          description: Item quantity approved by the provider
+        approvedTotal:
+          $ref: "#/components/schemas/MonetaryAmount"
+          description: Item price total approved by the provider
+        result:
+          $ref: "#/components/schemas/BenefitResultCode"
+
+    BaseLineItem:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Elera unique item identifier 
+        gtin:
+          type: string
+          description: GTIN (may not be padded with leading zeros) 
+    LineItem:
+      allOf:
+        - $ref: '#/components/schemas/BaseLineItem'
+      properties:
+        unitOfMeasure:
+          type: string
+          description: Unit of measure code for the GTIN
+        unitOfMeasureType:
+          type: string
+          description: The type that makes up the unit of measure
+        quantity:
+          type: integer
+          description: Item quantity for this line item
+        totalBeforeModifications;:
+          $ref: "#/components/schemas/MonetaryAmount"
+          description: Total price before discounts and modifications
+        total:
+          $ref: "#/components/schemas/MonetaryAmount"
+          description: Final item total price after discounts and modifications 
+    FundedLineItem:
+      allOf:
+        - $ref: '#/components/schemas/LineItem'
+      properties:
+        restrictionResults:
+          type: array
+          items:
+            - $ref: "#/components/schemas/RestrictionResult"
+        fundingRemaining:
+          $ref: "#/components/schemas/MonetaryAmount"
+          description: Remaining amount to fund for this line item (fully funded would be $0)
+    AdviceLineItem:
+      allOf:
+        - $ref: '#/components/schemas/BaseLineItem'
+      properties:
+        fundingAdvice:
+          $ref: "#/components/schemas/MonetaryAmount"
+          description: The advised amount to fund this line item
+    BenefitLineItem:
+      allOf:
+        - $ref: '#/components/schemas/BaseLineItem'
+      properties:
+        benefitResult:
+          $ref: "#/components/schemas/BenefitResult"
+
+    PreInquiryLineItem:
+      allOf:
+        - $ref: '#/components/schemas/BaseLineItem'
+      properties:
+        restrictedTenders:
+          type: array
+          items:
+            - $ref: "#/components/schemas/TenderIdentifier"
+
+    InquiryLineItem:
+      allOf:
+        - $ref: '#/components/schemas/BaseLineItem'
+      properties:
+        restrictionResult:
+          $ref: "#/components/schemas/RestrictionResult"
+
+    BenefitItem:
+      type: object
+      properties:
+        recordId:
+          type: string
+          description: Record number from the list of available benefits (sequential number)
+        category:
+          type: string
+          description: Product category code (commonly two digits)
+        categoryDescription:
+          type: string
+          description: Description of the product
+        unitOfMeasure:
+          type: string
+          description: Unit quantity type of the product (e.g. oz, lb, doz, gal, $$$, etc.)
+        subCategory:
+          type: string
+          description: Product sub category code (commonly three digits)
+        subCategoryDescription:
+          type: string
+          description: Subcategory description of the product
+        quantity:
+          type: string
+          description: Benefit quantity (might be an integer or decimal value)
+       
+
+  parameters:
+    clientId:
+      description: Client Id crepresenting the calling system (e.g. Lane or mobile POS).
+      schema:
+        type: string
+
+
+  messageTraits:
+    commonHeaders:
+      headers:
+        type: object
+        properties:
+          my-app-header:
+            type: integer
+            minimum: 0
+            maximum: 100
+
+
+  operationTraits:
+    mqtt:
+      bindings:
+        mqtt:
+          qos: 1
