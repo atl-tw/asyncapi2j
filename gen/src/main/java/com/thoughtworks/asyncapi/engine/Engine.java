@@ -68,8 +68,10 @@ public class Engine {
         switch (mimeType) {
           case "application/json" -> {
             var extractor = new SchemaObjectExtractor(jsonMapper, createTempDirectory());
-            extractor.extract(schema.getComponents().getSchemas().getAdditionalProperties());
+            var resolved = extractor.resolveAllOfInTheBaseTypes(source.toURI(), schema, schema.getComponents().getSchemas().getAdditionalProperties());
+            extractor.extract(resolved);
             extractor.render(jsonGenerationConfig);
+
           }
           default -> throw new IllegalArgumentException("Unsupported mime type: " + mimeType);
         }

@@ -18,7 +18,10 @@ class SchemaObjectExtractorTest {
     var jsonMapper = new ObjectMapper();
     var schema = yamlMapper.readValue(SchemaObjectExtractorTest.class.getResource("/schema.yaml"), AsyncAPI.class);
     var instance = new SchemaObjectExtractor(jsonMapper, output);
-    instance.extract(schema.getComponents().getSchemas().getAdditionalProperties());
+
+    var types= instance.resolveAllOfInTheBaseTypes(null, schema, schema.getComponents().getSchemas().getAdditionalProperties());
+
+    instance.extract(types);
     var config = new DefaultGenerationConfig() {
       @Override
       public String getTargetPackage() {
@@ -34,6 +37,13 @@ class SchemaObjectExtractorTest {
     };
     instance.render(config);
 
+  }
+
+  @Test
+  void testRegex(){
+    var value = "{\"$ref\":\"#/components/schemas/OrderDetails\"}";
+    var result = value.replaceAll("\"#/components/schemas/(.*)\"", "\"$1.json\"");
+    System.out.println(result);
   }
 
 }
