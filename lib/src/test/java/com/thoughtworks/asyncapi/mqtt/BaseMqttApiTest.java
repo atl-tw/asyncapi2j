@@ -1,7 +1,8 @@
 package com.thoughtworks.asyncapi.mqtt;
 
 import com.google.common.util.concurrent.Uninterruptibles;
-import com.thoughtworks.asyncapi.mqtt.impl.JacksonSerDe;
+import com.thoughtworks.asyncapi.serde.SerializerFactory;
+import com.thoughtworks.asyncapi.serde.impl.JacksonSerDe;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
 import org.junit.jupiter.api.BeforeEach;

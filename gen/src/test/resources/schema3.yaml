@@ -1,0 +1,234 @@
+asyncapi: 3.0.0
+info:
+  title: Sales Compliance Service
+  version: 1.0.0
+  description: test
+    The Sales Compliance service exists to ensure Kroger remains in compliance with government regulations specific data must be captured and stored based on certain sales transactions.
+
+defaultContentType: application/json
+
+servers:
+  dev/qa:
+    $ref: '#/components/servers/dev~1qa'
+
+channels:
+  piaRequest:
+    $ref: '#/components/channels/piaRequest'
+  piaReply:
+    $ref: '#/components/channels/piaReply'
+  transactionRequest:
+    $ref: '#/components/channels/transactionRequest'
+
+operations:
+  compliance/pia:
+    $ref: '#/components/operations/compliance~1pia'
+  compliance/transaction:
+    $ref: '#/components/operations/compliance~1transaction'
+
+components:
+  servers:
+    dev/qa:
+      host: 'rabbitmq:5672'
+      protocol: amqp
+      security:
+        - $ref: '#/components/securitySchemes/devQaScheme'
+      description: test
+        For development, uses the existing RabbitMQ in the ngpost-rabbit namespace of the aks-ax-shared-01-dev-eastus2 K8S cluster. Differentiate between DEV and QA by the virtual host (rabbitmq-ngpost-dev or rabbitmq-ngpost-qa). All messages should use the Sales-Compliance exchange, and each routing key is bound to a queue of the same name.
+        
+        This will eventually be migrated to a separate, dedicated RabbitMQ instance for Sales Compliance that is supposed to be located on the Edge server in each store.
+
+  securitySchemes:
+    devQaScheme:
+      type: userPassword
+
+  channelBindings:
+    amqpBindings:
+      amqp:
+        is: routingKey
+        exchange:
+          name: Sales-Compliance
+          type: topic
+          durable: true
+          autoDelete: false
+          vhost: rabbitmq-ngpost-dev OR rabbitmq-ngpost-qa
+        bindingVersion: 0.3.0
+
+  channels:
+    piaRequest:
+      address: compliance/pia
+      messages:
+        piaRequest:
+          $ref: '#/components/messages/piaRequest'
+      bindings:
+        $ref: '#/components/channelBindings/amqpBindings'
+    piaReply:
+      address: null
+      messages:
+        piaReply:
+          $ref: '#/components/messages/piaReply'
+    transactionRequest:
+      address: compliance/transaction
+      messages:
+        piaRequest:
+          $ref: '#/components/messages/transactionRequest'
+      bindings:
+        $ref: '#/components/channelBindings/amqpBindings'
+
+  operations:
+    compliance/pia:
+      description: test
+      action: send
+      channel:
+        $ref: '#/channels/piaRequest'
+      reply:
+        address:
+          description: test
+          location: "$message.header#/reply-to"
+        channel:
+          $ref: '#/channels/piaReply'
+
+    compliance/transaction:
+      description: test
+      action: send
+      channel:
+        $ref: '#/channels/transactionRequest'
+
+  messages:
+    piaRequest:
+      headers:
+        type: object
+        properties:
+          reply-to:
+            type: string
+            description: test
+      payload:
+        type: object
+        additionalProperties: false
+        required:
+          - transaction
+          - encryptedCustId
+          - encryptedIdType
+          - encryptedIdExpiration
+          - encryptedDOB
+          - encryptedLastName
+          - encryptedFirstName
+          - encryptedStreet
+          - encryptedCity
+          - encryptedState
+          - encryptedZip
+          - encryptedSSN
+        properties:
+          transaction:
+            type: string
+            description: test
+          encryptedCustId:
+            type: string
+            description: test
+          encryptedIdType:
+            type: string
+            description: test
+          encryptedIdExpiration:
+            type: string
+            description: test
+          encryptedDOB:
+            type: string
+            description: test
+          encryptedLastName:
+            type: string
+            description: test
+          encryptedFirstName:
+            type: string
+            description: test
+          encryptedStreet:
+            type: string
+            description: test
+          encryptedCity:
+            type: string
+            description: test
+          encryptedState:
+            type: string
+            description: test
+          encryptedZip:
+            type: string
+            description: test
+          encryptedSSN:
+            type: string
+            description: test
+
+    piaReply:
+      payload:
+        type: object
+        additionalProperties: false
+        required: ["ref", "transaction"]
+        properties:
+          ref:
+            type: string
+            description: test
+          transaction:
+            type: string
+            description: test
+
+    transactionRequest:
+      payload:
+        type: object
+        additionalProperties: false
+        required:
+          - timestamp
+          - salesComplianceRefId
+          - storeNumber
+          - divisionNumber
+          - terminalId
+          - operatorId
+          - tenderTypes
+          - prepaidCards
+        properties:
+          timestamp:
+            type: string
+            description: test
+          salesComplianceRefId:
+            type: string
+            description: test
+          storeNumber:
+            type: string
+            description: test
+          divisionNumber:
+            type: string
+            description: test
+          terminalId:
+            type: string
+            description: test
+          operatorId:
+            type: string
+            description: test
+          loyaltyNumber:
+            type: string
+            description: test
+          tenderTypes:
+            type: array
+            items:
+              type: string
+              pattern: '^\d\d$'
+              description: test
+          prepaidCards:
+            type: array
+            items:
+              type: object
+              description: test
+              properties:
+                upc:
+                  type: string
+                  description: test
+                cardPlanId:
+                  type: string
+                  description: test
+                purchaseAmount:
+                  type: string
+                  pattern: '^\d+\.\d\d$'
+                  description: test
+                activationAmount:
+                  type: string
+                  pattern: '^\d+\.\d\d$'
+                  description: test
+                quantity:
+                  type: integer
+                  description: test

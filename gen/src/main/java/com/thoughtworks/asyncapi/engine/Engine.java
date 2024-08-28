@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @SuppressWarnings({"SwitchStatementWithTooFewBranches", "unchecked"})
 public class Engine {
@@ -56,19 +57,40 @@ public class Engine {
     var protocols = servers.values().stream().map(m -> (Map<String, Object>) m).map(m -> m.get("protocol")).map(Objects::toString).toList();
 
     switch (version) {
+      case "3.0.0" -> {
+        var schema3 = yamlMapper.readValue(source, com.thoughtworks.asyncapi.spec.v3_0_0.AsyncAPI.class);
+        // todo protocol implementation
+        switch (mimeType) {
+          case "application/json" -> {
+            var extractor = new SchemaObjectExtractor(jsonMapper, createTempDirectory());
+            var payloads = schema3.getComponents().getMessages().getAdditionalProperties()
+                .entrySet()
+                .stream()
+                .map(e-> {
+                  var message = (Map<String, Object>) e.getValue();
+                  return Map.entry( e.getKey(), message.get("payload"));
+                })
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+            var resolved = extractor.resolveAllOfInTheBaseTypes(source.toURI(), schema3, payloads);
+            extractor.extract(resolved);
+            extractor.render(jsonGenerationConfig);
+          }
+          default -> throw new IllegalArgumentException("Unsupported mime type: " + mimeType);
+        }
+      }
       case "2.6.0" -> {
-        var schema = yamlMapper.readValue(source, com.thoughtworks.asyncapi.spec.v2_6_0.AsyncAPI.class);
+        var schema2 = yamlMapper.readValue(source, com.thoughtworks.asyncapi.spec.v2_6_0.AsyncAPI.class);
         protocols.forEach(proto -> {
           switch (proto) {
             case "mqtt" ->
-                generators.add(new com.thoughtworks.asyncapi.codegen.v2_6_0.MqttClientGenerator(source.toURI(), schema, packageName, output));
+                generators.add(new com.thoughtworks.asyncapi.codegen.v2_6_0.MqttClientGenerator(source.toURI(), schema2, packageName, output));
             default -> throw new IllegalArgumentException("Unsupported protocol: " + proto);
           }
         });
         switch (mimeType) {
           case "application/json" -> {
             var extractor = new SchemaObjectExtractor(jsonMapper, createTempDirectory());
-            var resolved = extractor.resolveAllOfInTheBaseTypes(source.toURI(), schema, schema.getComponents().getSchemas().getAdditionalProperties());
+            var resolved = extractor.resolveAllOfInTheBaseTypes(source.toURI(), schema2, schema2.getComponents().getSchemas().getAdditionalProperties());
             extractor.extract(resolved);
             extractor.render(jsonGenerationConfig);
 

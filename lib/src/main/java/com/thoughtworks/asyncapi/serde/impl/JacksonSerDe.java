@@ -1,8 +1,8 @@
-package com.thoughtworks.asyncapi.mqtt.impl;
+package com.thoughtworks.asyncapi.serde.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.thoughtworks.asyncapi.mqtt.SerDe;
-import com.thoughtworks.asyncapi.mqtt.SerializerFactory;
+import com.thoughtworks.asyncapi.serde.SerDe;
+import com.thoughtworks.asyncapi.serde.SerializerFactory;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;

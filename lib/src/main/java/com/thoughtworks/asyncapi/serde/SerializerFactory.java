@@ -1,4 +1,4 @@
-package com.thoughtworks.asyncapi.mqtt;
+package com.thoughtworks.asyncapi.serde;
 
 import java.util.Map;
 

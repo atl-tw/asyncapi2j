@@ -43,6 +43,16 @@ class EngineTest {
   }
 
   @Test
+  void testGenerate() throws Exception {
+    Engine engine = new Engine();
+    var target = new File("target/EngineTest3");
+    target.mkdir();
+    var config = new JsonGenerationConfig();
+    config.setGenerateBuilders(true);
+    engine.run(new File("src/test/resources/schema3.yaml"), target, "com.kroger.apis.compliance", config);
+  }
+
+  @Test
   void testGenerateAndRun() throws Exception {
     Engine engine = new Engine();
     var target = new File("target/EngineTest");

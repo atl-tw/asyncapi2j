@@ -9,7 +9,7 @@ import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.thoughtworks.asyncapi.codegen.Generator;
 import com.thoughtworks.asyncapi.mqtt.BaseMqttApi;
-import com.thoughtworks.asyncapi.mqtt.SerializerFactory;
+import com.thoughtworks.asyncapi.serde.SerializerFactory;
 import com.thoughtworks.asyncapi.spec.v2_6_0.AsyncAPI;
 import com.thoughtworks.asyncapi.spec.v2_6_0.Operation;
 import com.thoughtworks.asyncapi.spec.v2_6_0.OperationTrait;

@@ -72,15 +72,26 @@
                 <groupId>org.jsonschema2pojo</groupId>
                 <artifactId>jsonschema2pojo-maven-plugin</artifactId>
                 <version>1.2.1</version>
-                <configuration>
-                    <sourceDirectory>${basedir}/src/main/spec/2.6.0</sourceDirectory>
-                    <targetPackage>com.thoughtworks.asyncapi.spec.v2_6_0</targetPackage>
-                </configuration>
                 <executions>
                     <execution>
+                        <id>2.6.0</id>
                         <goals>
                             <goal>generate</goal>
                         </goals>
+                        <configuration>
+                            <sourceDirectory>${basedir}/src/main/spec/2.6.0</sourceDirectory>
+                            <targetPackage>com.thoughtworks.asyncapi.spec.v2_6_0</targetPackage>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>3.0.0</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <sourceDirectory>${basedir}/src/main/spec/3.0.0</sourceDirectory>
+                            <targetPackage>com.thoughtworks.asyncapi.spec.v3_0_0</targetPackage>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

@@ -2,6 +2,7 @@ package com.thoughtworks.asyncapi.mqtt;
 
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
+import com.thoughtworks.asyncapi.serde.SerializerFactory;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
