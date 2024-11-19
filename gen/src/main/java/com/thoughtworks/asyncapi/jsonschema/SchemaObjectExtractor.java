@@ -32,6 +32,7 @@ public class SchemaObjectExtractor {
   }
   @SuppressWarnings("unchecked")
   public Map<String, Object> resolveAllOfInTheBaseTypes(URI baseUri, Object definition, Map<String, Object> target){
+
     target.values()
         .forEach(e->{
           if(e instanceof Map entryMap){
@@ -39,7 +40,6 @@ public class SchemaObjectExtractor {
               var allOf = (List<?>) entryMap.get(ALL_OF);
               allOf.stream().map(o-> {
                         Map<String, Object> r =  ReferenceResolver.resolveReference(baseUri, definition, (Map<String, Object>) o);
-
                         return r;
                       }
                   )
@@ -79,7 +79,7 @@ public class SchemaObjectExtractor {
             try {
               schemaMapper.generate(codeModel, file.getName(), config.getTargetPackage()+".model", file.toURI().toURL());
               codeModel.build(config.getTargetDirectory());
-            } catch (IOException e) {
+            } catch (Exception e) {
               throw new SchemaExtractorException("Failed to process file: " + file.getName(), e);
             }
           });

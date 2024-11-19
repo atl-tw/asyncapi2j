@@ -9,6 +9,7 @@ import com.thoughtworks.asyncapi.jsonschema.SchemaObjectExtractor;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -35,6 +36,9 @@ public class Engine {
     }
 
     return (temp);
+//    File tmp = new File("./target/gen");
+//    tmp.mkdir();
+//    return tmp;
   }
 
   public void run(File source, File output, String packageName, JsonGenerationConfig jsonGenerationConfig) throws Exception {
@@ -71,7 +75,9 @@ public class Engine {
                   return Map.entry( e.getKey(), message.get("payload"));
                 })
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-            var resolved = extractor.resolveAllOfInTheBaseTypes(source.toURI(), schema3, payloads);
+            var payloadsWithSchemas = new HashMap<>(payloads);
+            payloadsWithSchemas.putAll(schema3.getComponents().getSchemas().getAdditionalProperties());
+            var resolved = extractor.resolveAllOfInTheBaseTypes(source.toURI(), schema3, payloadsWithSchemas);
             extractor.extract(resolved);
             extractor.render(jsonGenerationConfig);
           }
