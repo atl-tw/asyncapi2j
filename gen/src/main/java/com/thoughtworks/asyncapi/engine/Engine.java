@@ -15,6 +15,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static java.util.Optional.ofNullable;
+
 @SuppressWarnings({"SwitchStatementWithTooFewBranches", "unchecked"})
 public class Engine {
 
@@ -76,7 +78,8 @@ public class Engine {
                 })
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
             var payloadsWithSchemas = new HashMap<>(payloads);
-            payloadsWithSchemas.putAll(schema3.getComponents().getSchemas().getAdditionalProperties());
+            ofNullable(schema3.getComponents().getSchemas())
+                .ifPresent(schemas -> payloadsWithSchemas.putAll(schemas.getAdditionalProperties()));
             var resolved = extractor.resolveAllOfInTheBaseTypes(source.toURI(), schema3, payloadsWithSchemas);
             extractor.extract(resolved);
             extractor.render(jsonGenerationConfig);
