@@ -192,10 +192,10 @@ public class MqttClientGenerator implements Generator {
           .add("var params = java.util.Map.of(");
       var first = new AtomicBoolean(true);
       parameters.forEach((k, v) -> GenerationException.call(() -> {
-        block.add("$S, $L", k, k);
         if (!first.get())
           block.add(",");
         first.set(false);
+        block.add("$S, $L", k, k);
         return null;
       }));
       block.add(")");
@@ -232,10 +232,10 @@ public class MqttClientGenerator implements Generator {
           .add("var params = java.util.Map.of(");
       var first = new AtomicBoolean(true);
       parameters.forEach((k, v) -> GenerationException.call(() -> {
-        block.add("$S, $L", k, k);
         if (!first.get())
           block.add(",");
         first.set(false);
+        block.add("$S, $L", k, k);
         return null;
       }));
       block.add(")");
