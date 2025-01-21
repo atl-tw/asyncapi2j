@@ -24,15 +24,18 @@ public class SchemaObjectExtractor {
   public static final String ALL_OF = "allOf";
   private final ObjectMapper mapper;
   private final File tmpDir;
-  public SchemaObjectExtractor(ObjectMapper mapper, File tmpDir) {
+  private final boolean expandJsonFiles;
+  public SchemaObjectExtractor(ObjectMapper mapper, File tmpDir, boolean expandJsonFiles) {
     this.mapper = mapper;
     this.tmpDir = tmpDir;
+    this.expandJsonFiles = expandJsonFiles;
     //noinspection ResultOfMethodCallIgnored
     this.tmpDir.mkdirs();
   }
+
+
   @SuppressWarnings("unchecked")
   public Map<String, Object> resolveAllOfInTheBaseTypes(URI baseUri, Object definition, Map<String, Object> target){
-
     target.values()
         .forEach(e->{
           if(e instanceof Map entryMap){
@@ -66,6 +69,17 @@ public class SchemaObjectExtractor {
         throw new SchemaExtractorException("Failed to write schema object to file", e);
       }
     });
+    if(this.expandJsonFiles){
+      var expander = new Expander();
+      Arrays.asList(Objects.requireNonNull(tmpDir.listFiles()))
+          .forEach(file-> {
+            try {
+              expander.expandFile(file, tmpDir);
+            } catch (IOException e) {
+              throw new RuntimeException(e);
+            }
+          });
+    }
   }
 
   public void render(GenerationConfig config) {
@@ -77,7 +91,7 @@ public class SchemaObjectExtractor {
             JCodeModel codeModel = new JCodeModel();
             SchemaMapper schemaMapper = new SchemaMapper(new RuleFactory(config, new Jackson2Annotator(config), new SchemaStore()), new SchemaGenerator());
             try {
-              schemaMapper.generate(codeModel, file.getName(), config.getTargetPackage()+".model", file.toURI().toURL());
+              var type = schemaMapper.generate(codeModel, file.getName(), config.getTargetPackage()+".model", file.toURI().toURL());
               codeModel.build(config.getTargetDirectory());
             } catch (Exception e) {
               throw new SchemaExtractorException("Failed to process file: " + file.getName(), e);

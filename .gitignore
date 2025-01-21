@@ -706,3 +706,4 @@ FodyWeavers.xsd
 !/.env
 !/.env
 /.env
+/gen/src/test/resources/payment.yaml

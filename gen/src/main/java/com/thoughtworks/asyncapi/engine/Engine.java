@@ -20,27 +20,32 @@ import static java.util.Optional.ofNullable;
 @SuppressWarnings({"SwitchStatementWithTooFewBranches", "unchecked"})
 public class Engine {
 
+  public static String TEMP_FOLDER;
   private final ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
   private final ObjectMapper jsonMapper = new ObjectMapper();
 
   public static File createTempDirectory()
       throws IOException {
-    final File temp;
 
-    temp = File.createTempFile("temp", Long.toString(System.nanoTime()));
+    return ofNullable(TEMP_FOLDER)
+        .map(File::new)
+        .orElseGet(() -> {
+          try {
+            final File temp;
+            temp = File.createTempFile("temp", Long.toString(System.nanoTime()));
 
-    if (!(temp.delete())) {
-      throw new IOException("Could not delete temp file: " + temp.getAbsolutePath());
-    }
+            if (!(temp.delete())) {
+              throw new IOException("Could not delete temp file: " + temp.getAbsolutePath());
+            }
 
-    if (!(temp.mkdir())) {
-      throw new IOException("Could not create temp directory: " + temp.getAbsolutePath());
-    }
-
-    return (temp);
-//    File tmp = new File("./target/gen");
-//    tmp.mkdir();
-//    return tmp;
+            if (!(temp.mkdir())) {
+              throw new IOException("Could not create temp directory: " + temp.getAbsolutePath());
+            }
+            return temp;
+          } catch (Exception e) {
+            throw new RuntimeException(e);
+          }
+        });
   }
 
   public void run(File source, File output, String packageName, JsonGenerationConfig jsonGenerationConfig) throws Exception {
@@ -68,13 +73,13 @@ public class Engine {
         // todo protocol implementation
         switch (mimeType) {
           case "application/json" -> {
-            var extractor = new SchemaObjectExtractor(jsonMapper, createTempDirectory());
+            var extractor = new SchemaObjectExtractor(jsonMapper, createTempDirectory(), jsonGenerationConfig.isExpandAllOf());
             var payloads = schema3.getComponents().getMessages().getAdditionalProperties()
                 .entrySet()
                 .stream()
-                .map(e-> {
+                .map(e -> {
                   var message = (Map<String, Object>) e.getValue();
-                  return Map.entry( e.getKey(), message.get("payload"));
+                  return Map.entry(e.getKey(), message.get("payload"));
                 })
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
             var payloadsWithSchemas = new HashMap<>(payloads);
@@ -98,7 +103,7 @@ public class Engine {
         });
         switch (mimeType) {
           case "application/json" -> {
-            var extractor = new SchemaObjectExtractor(jsonMapper, createTempDirectory());
+            var extractor = new SchemaObjectExtractor(jsonMapper, createTempDirectory(),jsonGenerationConfig.isExpandAllOf());
             var resolved = extractor.resolveAllOfInTheBaseTypes(source.toURI(), schema2, schema2.getComponents().getSchemas().getAdditionalProperties());
             extractor.extract(resolved);
             extractor.render(jsonGenerationConfig);

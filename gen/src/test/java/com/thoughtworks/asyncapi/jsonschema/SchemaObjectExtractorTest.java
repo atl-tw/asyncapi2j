@@ -17,7 +17,7 @@ class SchemaObjectExtractorTest {
     var yamlMapper  = new ObjectMapper(new YAMLFactory());
     var jsonMapper = new ObjectMapper();
     var schema = yamlMapper.readValue(SchemaObjectExtractorTest.class.getResource("/schema.yaml"), AsyncAPI.class);
-    var instance = new SchemaObjectExtractor(jsonMapper, output);
+    var instance = new SchemaObjectExtractor(jsonMapper, output, false);
 
     var types= instance.resolveAllOfInTheBaseTypes(null, schema, schema.getComponents().getSchemas().getAdditionalProperties());
 

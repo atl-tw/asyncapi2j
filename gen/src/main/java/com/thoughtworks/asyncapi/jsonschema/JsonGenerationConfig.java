@@ -209,6 +209,22 @@ public class JsonGenerationConfig implements GenerationConfig {
   @Parameter
   private boolean useJakartaValidation = DEFAULT_GENERATION_CONFIG.isUseJakartaValidation();
 
+
+  public boolean isExpandAllOf() {
+    return expandAllOf;
+  }
+
+  public void setExpandAllOf(boolean expandAllOf) {
+    this.expandAllOf = expandAllOf;
+  }
+
+  @CommandLine.Option(names = "--json-expand-allOf")
+  @Parameter
+  private boolean expandAllOf = false;
+
+
+
+
   @Override
   public boolean isGenerateBuilders() {
     return generateBuilders;
