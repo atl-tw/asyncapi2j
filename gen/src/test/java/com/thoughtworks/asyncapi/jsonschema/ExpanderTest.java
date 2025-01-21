@@ -21,7 +21,7 @@ class ExpanderTest {
 
     File source = new File("src/test/resources/postProcess/Child.json");
     target.mkdir();
-    instance.expandFile(source, target);
+    instance.expandAllOf(source, target);
 
     var read = mapper.readValue(new File(target, source.getName()), LinkedHashMap.class);
     var props = (Map) read.get("properties");

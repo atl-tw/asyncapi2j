@@ -52,17 +52,17 @@ class EngineTest {
     engine.run(new File("src/test/resources/schema3.yaml"), target, "com.kroger.apis.compliance", config);
   }
 
-//  @Test
-//  void testGenerateAcceptance() throws Exception {
-//    Engine.TEMP_FOLDER = "target/json";
-//    Engine engine = new Engine();
-//    var target = new File("target/acceptance");
-//    target.mkdir();
-//    var config = new JsonGenerationConfig();
-//    config.setGenerateBuilders(true);
-//    config.setExpandAllOf(true);
-//    engine.run(new File("src/test/resources/payment.yaml"), target, "com.kroger.apis.acceptance", config);
-//  }
+  @Test
+  void testGenerateAcceptance() throws Exception {
+    Engine.TEMP_FOLDER = "target/json";
+    Engine engine = new Engine();
+    var target = new File("target/acceptance");
+    target.mkdir();
+    var config = new JsonGenerationConfig();
+    config.setGenerateBuilders(true);
+    config.setExpandAllOf(true);
+    engine.run(new File("src/test/resources/payment.yaml"), target, "com.kroger.apis.acceptance", config);
+  }
 
   @Test
   void testGenerateAndRun() throws Exception {
