@@ -22,4 +22,14 @@ class MqttClientGeneratorTest {
     instance.generate();
   }
 
+  @Test
+  void testGeneratePayments() throws IOException, URISyntaxException {
+    var output = new File("target/payment");
+    var yamlMapper  = new ObjectMapper(new YAMLFactory());
+    var jsonMapper = new ObjectMapper();
+    var schema = yamlMapper.readValue(MqttClientGeneratorTest.class.getResource("/payment.yaml"), AsyncAPI.class);
+    var instance = new MqttClientGenerator(Objects.requireNonNull(MqttClientGeneratorTest.class.getResource("/payment.yaml")).toURI(), schema, "com.tw.test", output);
+    instance.generate();
+  }
+
 }

@@ -209,6 +209,17 @@ public class JsonGenerationConfig implements GenerationConfig {
   @Parameter
   private boolean useJakartaValidation = DEFAULT_GENERATION_CONFIG.isUseJakartaValidation();
 
+  @CommandLine.Option(names = "--java-classNamePrefix")
+  @Parameter
+  private String javaClassNamePrefix = "";
+
+  public String getJavaClassNamePrefix() {
+    return javaClassNamePrefix;
+  }
+
+  public void setJavaClassNamePrefix(String javaClassNamePrefix) {
+    this.javaClassNamePrefix = javaClassNamePrefix;
+  }
 
   public boolean isExpandAllOf() {
     return expandAllOf;
