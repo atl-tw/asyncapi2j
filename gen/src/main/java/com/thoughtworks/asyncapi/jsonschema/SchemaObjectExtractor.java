@@ -25,14 +25,12 @@ public class SchemaObjectExtractor {
   private final ObjectMapper mapper;
   private final File tmpDir;
   private final boolean expandJsonFiles;
-  private String classNamePrefix;
-  public SchemaObjectExtractor(ObjectMapper mapper, File tmpDir, boolean expandJsonFiles, String classNamePrefix) {
+  public SchemaObjectExtractor(ObjectMapper mapper, File tmpDir, boolean expandJsonFiles) {
     this.mapper = mapper;
     this.tmpDir = tmpDir;
     this.expandJsonFiles = expandJsonFiles;
     //noinspection ResultOfMethodCallIgnored
     this.tmpDir.mkdirs();
-    this.classNamePrefix = classNamePrefix;
   }
 
 
@@ -63,9 +61,9 @@ public class SchemaObjectExtractor {
   public void extract(Map<String, Object> parsedSchemaObjects) {
     parsedSchemaObjects.forEach((key, value) -> {
       try {
-        File file = new File(tmpDir, classNamePrefix+key+".json");
+        File file = new File(tmpDir, key+".json");
         var string = mapper.writeValueAsString(value);
-        string = string.replaceAll("\"#/components/schemas/(\\w*)\"", "\"./"+classNamePrefix+"$1.json\"") ;
+        string = string.replaceAll("\"#/components/schemas/(\\w*)\"", "\"./$1.json\"") ;
         Files.write(file.toPath(), string.getBytes());
       } catch (Exception e) {
         throw new SchemaExtractorException("Failed to write schema object to file", e);

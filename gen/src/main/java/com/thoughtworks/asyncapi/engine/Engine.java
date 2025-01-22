@@ -73,7 +73,7 @@ public class Engine {
         // todo protocol implementation
         switch (mimeType) {
           case "application/json" -> {
-            var extractor = new SchemaObjectExtractor(jsonMapper, createTempDirectory(), jsonGenerationConfig.isExpandAllOf(), jsonGenerationConfig.getClassNamePrefix());
+            var extractor = new SchemaObjectExtractor(jsonMapper, createTempDirectory(), jsonGenerationConfig.isExpandAllOf());
             var payloads = schema3.getComponents().getMessages().getAdditionalProperties()
                 .entrySet()
                 .stream()
@@ -103,7 +103,7 @@ public class Engine {
         });
         switch (mimeType) {
           case "application/json" -> {
-            var extractor = new SchemaObjectExtractor(jsonMapper, createTempDirectory(),jsonGenerationConfig.isExpandAllOf(), jsonGenerationConfig.getClassNamePrefix());
+            var extractor = new SchemaObjectExtractor(jsonMapper, createTempDirectory(),jsonGenerationConfig.isExpandAllOf());
             var resolved = extractor.resolveAllOfInTheBaseTypes(source.toURI(), schema2, schema2.getComponents().getSchemas().getAdditionalProperties());
             extractor.extract(resolved);
             extractor.render(jsonGenerationConfig);

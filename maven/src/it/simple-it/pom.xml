@@ -81,7 +81,6 @@
           <packageName>com.thoughtworks.asyncapi.it</packageName>
           <json>
             <generateBuilders>true</generateBuilders>
-            <javaClassNamePrefix>Test</javaClassNamePrefix>
           </json>
         </configuration>
       </plugin>
