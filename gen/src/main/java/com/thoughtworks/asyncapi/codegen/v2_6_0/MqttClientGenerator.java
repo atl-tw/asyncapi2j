@@ -51,12 +51,16 @@ public class MqttClientGenerator implements Generator {
   private final LinkedHashMap<String, Class<?>> baseTypesByProtocol = new LinkedHashMap<>();
   private final URI baseUri;
   private Map<String, Object> unreferencedTypes = new HashMap<>();
+  private final String prefix;
+  private final String suffix;
 
-  public MqttClientGenerator(URI baseUri, AsyncAPI specification, String packageName, File outputDirectory) {
+  public MqttClientGenerator(URI baseUri, AsyncAPI specification, String packageName, File outputDirectory, String prefix, String suffix) {
     this.baseUri = baseUri;
     this.specification = specification;
     this.outputDirectory = outputDirectory;
     this.packageName = packageName;
+    this.prefix = ofNullable(prefix).orElse("");
+    this.suffix = ofNullable(suffix).orElse("");
     specification.getServers()
         .getAdditionalProperties()
         .values()
@@ -147,7 +151,7 @@ public class MqttClientGenerator implements Generator {
             asMap(ReferenceResolver.resolveReference(baseUri, specification, (Map<String, ?>) refMap.get("payload")))
                 .ifPresent(payloadMap -> {
                   if (payloadMap.containsKey("@asyncapi_name")) {
-                    payloadTypeName.set(payloadMap.get("@asyncapi_name").toString());
+                    payloadTypeName.set(prefix+payloadMap.get("@asyncapi_name").toString()+suffix);
                   } else {
                     payloadTypeName.set(operation.getOperationId() + "Payload");
                     unreferencedTypes.put(operation.getOperationId() + "Payload", payloadMap);

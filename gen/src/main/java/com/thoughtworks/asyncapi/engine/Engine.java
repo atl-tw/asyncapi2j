@@ -97,7 +97,7 @@ public class Engine {
         protocols.forEach(proto -> {
           switch (proto) {
             case "mqtt" ->
-                generators.add(new com.thoughtworks.asyncapi.codegen.v2_6_0.MqttClientGenerator(source.toURI(), schema2, packageName, output));
+                generators.add(new com.thoughtworks.asyncapi.codegen.v2_6_0.MqttClientGenerator(source.toURI(), schema2, packageName, output, jsonGenerationConfig.getClassNamePrefix(), jsonGenerationConfig.getClassNameSuffix()));
             default -> throw new IllegalArgumentException("Unsupported protocol: " + proto);
           }
         });

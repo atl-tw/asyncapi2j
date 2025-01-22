@@ -18,7 +18,7 @@ class MqttClientGeneratorTest {
     var yamlMapper  = new ObjectMapper(new YAMLFactory());
     var jsonMapper = new ObjectMapper();
     var schema = yamlMapper.readValue(MqttClientGeneratorTest.class.getResource("/schema.yaml"), AsyncAPI.class);
-    var instance = new MqttClientGenerator(Objects.requireNonNull(MqttClientGeneratorTest.class.getResource("/schema.yaml")).toURI(), schema, "com.tw.test", output);
+    var instance = new MqttClientGenerator(Objects.requireNonNull(MqttClientGeneratorTest.class.getResource("/schema.yaml")).toURI(), schema, "com.tw.test", output, "TT", "");
     instance.generate();
   }
 
