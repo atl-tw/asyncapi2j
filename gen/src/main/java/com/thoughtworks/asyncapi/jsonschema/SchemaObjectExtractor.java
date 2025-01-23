@@ -75,7 +75,6 @@ public class SchemaObjectExtractor {
           .forEach(file-> {
             try {
               expander.expandAllOf(file, tmpDir);
-              expander.expandArrays(file, tmpDir);
             } catch (IOException e) {
               throw new RuntimeException(e);
             }

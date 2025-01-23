@@ -70,7 +70,12 @@ public class Expander {
             LinkedHashMap readProperties  = ofNullable(read.get("properties"))
                 .map(o-> (LinkedHashMap) o)
                 .orElseGet(LinkedHashMap::new);
-            properties.putAll(readProperties);
+            readProperties.forEach(
+                (k,v)-> {
+                  if(!properties.containsKey(k))
+                    properties.put(k, v);
+                }
+            );
             contents.put("properties", properties);
           }
         });
